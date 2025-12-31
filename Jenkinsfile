@@ -5,15 +5,15 @@ pipeline {
         DOCKER_REGISTRY = "docker.io"
         DOCKER_NAMESPACE = "madhudocker03"
 
-        BACKEND_IMAGE = "${DOCKER_NAMESPACE}/backend 1"
-        FRONTEND_IMAGE = "${DOCKER_NAMESPACE}/frontend 1"
+        BACKEND_IMAGE = "${DOCKER_NAMESPACE}/backend"
+        FRONTEND_IMAGE = "${DOCKER_NAMESPACE}/frontend"
 
-        IMAGE_TAG = "staging-${BUILD_NUMBER}"
+        IMAGE_TAG = "1"
 
         COMPOSE_FILE = "docker-compose.yml"
     }
 
-    stages {
+     stages {
 
         stage("Checkout Source") {
             steps {
