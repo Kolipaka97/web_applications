@@ -12,6 +12,7 @@ pipeline {
 
         COMPOSE_FILE = "docker-compose.yml"
     }
+    
 
      stages {
 
