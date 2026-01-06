@@ -7,17 +7,18 @@ pipeline {
 
         BACKEND_IMAGE = "${DOCKER_NAMESPACE}/backend"
         FRONTEND_IMAGE = "${DOCKER_NAMESPACE}/frontend"
+
         IMAGE_TAG = "1"
 
         COMPOSE_FILE = "docker-compose.yml"
     }
 
-    stages {
+
+     stages {
 
         stage("Checkout Source") {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Kolipaka97/web_applications.git'
+                git branch: 'main', url: 'https://github.com/Kolipaka97/web_applications.git'
             }
         }
 
@@ -35,7 +36,7 @@ pipeline {
                 sh """
                 docker run --rm \
                   $BACKEND_IMAGE:$IMAGE_TAG \
-                  python -m pytest
+                  pytest
                 """
             }
         }
@@ -43,31 +44,25 @@ pipeline {
         stage("Security Scan (Trivy)") {
             steps {
                 sh """
-                trivy image --exit-code 0 --severity HIGH,CRITICAL \
+                trivy image --severity HIGH,CRITICAL \
                   $BACKEND_IMAGE:$IMAGE_TAG
 
-                trivy image --exit-code 0 --severity HIGH,CRITICAL \
+                trivy image --severity HIGH,CRITICAL \
                   $FRONTEND_IMAGE:$IMAGE_TAG
                 """
             }
         }
 
-        stage("Docker Login") {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )
-                ]) {
-                    sh '''
-                      echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    '''
-                }
-            }
+    stage('Docker Login') {
+    steps {
+        withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')]) {
+            sh '''
+              set -e
+              echo "$DOCKER_PASS" | docker login -u madhudocker03 --password-stdin
+            '''
         }
-
+    }
+}
         stage("Push Images to Registry") {
             steps {
                 sh """
@@ -84,6 +79,7 @@ pipeline {
                 export FRONTEND_IMAGE=$FRONTEND_IMAGE:$IMAGE_TAG
 
                 docker-compose down
+                docker-compose pull
                 docker-compose up -d
                 """
             }
@@ -92,7 +88,7 @@ pipeline {
         stage("Run Database Migration") {
             steps {
                 sh """
-                docker-compose exec -T backend \
+                docker exec \$(docker ps -qf "name=backend") \
                   psql -h db -U empuser empdb -f /app/models.sql
                 """
             }
@@ -111,10 +107,10 @@ pipeline {
 
     post {
         success {
-            echo "Deployment successful!"
+            echo " Deployment successful!"
         }
         failure {
-            echo "Pipeline failed!"
+            echo " Pipeline failed!"
         }
         cleanup {
             sh "docker system prune -f"
