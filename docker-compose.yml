@@ -1,32 +1,14 @@
-version: "3.9"
-
 services:
-  db:
-    image: postgres:16
-    container_name: employee_db
-    restart: always
-    environment:
-      POSTGRES_DB: employee_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
   backend:
-    build: ../backend
-    container_name: employee_backend
-    restart: always
+    image: ${BACKEND_IMAGE}
+    build: ./backend
     ports:
       - "5000:5000"
-    environment:
-      DB_HOST: db
-      DB_NAME: employee_db
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-    depends_on:
-      - db
 
-volumes:
-  pgdata:
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
