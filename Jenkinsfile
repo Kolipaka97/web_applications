@@ -72,18 +72,16 @@ pipeline {
             }
         }
 
-        stage("Deploy to Staging") {
-            steps {
-                sh """
-                export BACKEND_IMAGE=$BACKEND_IMAGE:$IMAGE_TAG
-                export FRONTEND_IMAGE=$FRONTEND_IMAGE:$IMAGE_TAG
-
-                docker-compose down
-                docker-compose pull
-                docker-compose up -d
-                """
-            }
-        }
+        stage('Deploy to Staging') {
+    steps {
+        sh '''
+            export BACKEND_IMAGE=madhudocker03/backend:1
+            export FRONTEND_IMAGE=madhudocker03/frontend:1
+            docker compose down
+            docker compose up -d
+        '''
+    }
+}
 
         stage("Run Database Migration") {
             steps {
