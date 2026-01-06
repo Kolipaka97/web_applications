@@ -12,7 +12,7 @@ pipeline {
 
         COMPOSE_FILE = "docker-compose.yml"
     }
-    
+
 
      stages {
 
@@ -53,20 +53,16 @@ pipeline {
             }
         }
 
-        stage("Docker Login") {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'madhudocker03',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh """
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    """
-                }
-            }
+    stage('Docker Login') {
+    steps {
+        withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')]) {
+            sh '''
+              set -e
+              echo "$DOCKER_PASS" | docker login -u madhudocker03 --password-stdin
+            '''
         }
-
+    }
+}
         stage("Push Images to Registry") {
             steps {
                 sh """
