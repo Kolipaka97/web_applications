@@ -1,44 +1,22 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:16
-    container_name: employee_db
     environment:
-      POSTGRES_DB: empdb
-      POSTGRES_USER: empuser
-      POSTGRES_PASSWORD: emppass
-    ports:
-      - "5432:5432"   # optional (only if you want local access)
+     POSTGRES_DB: empdb
+     POSTGRES_USER: empuser
+     POSTGRES_PASSWORD: emppass
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U empuser -d empdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
+      - ./backend/models.sql:/app/models.sql
   backend:
     image: ${BACKEND_IMAGE}
-    container_name: employee_backend
     ports:
       - "5001:5000"
     depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DB_HOST: db
-      DB_NAME: empdb
-      DB_USER: empuser
-      DB_PASSWORD: emppass
+      - db  
 
   frontend:
     image: ${FRONTEND_IMAGE}
-    container_name: employee_frontend
     ports:
       - "8081:80"
     depends_on:
       - backend
-
-volumes:
-  postgres_data:
