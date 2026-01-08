@@ -83,14 +83,14 @@ pipeline {
     }
 }
 
-        stage("Run Database Migration") {
-            steps {
-                sh """
-                docker exec \$(docker ps -qf "name=backend") \
-                  psql -h db -U empuser empdb -f /app/models.sql
-                """
-            }
-        }
+       stage("Run Database Migration") {
+    steps {
+        sh '''
+        DB_CONTAINER=$(docker ps -qf name=db)
+        docker exec $DB_CONTAINER psql -U empuser -d empdb -f /app/models.sql
+        '''
+    }
+}
 
         stage("Verify Deployment") {
             steps {

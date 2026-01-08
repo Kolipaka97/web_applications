@@ -1,4 +1,8 @@
 services:
+  db:
+    image: postgres:16
+    volumes:
+      - ./backend/models.sql:/app/models.sql
   backend:
     image: ${BACKEND_IMAGE}
     build: ./backend
