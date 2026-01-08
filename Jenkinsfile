@@ -92,15 +92,14 @@ pipeline {
             }
         }
 
-        stage("Verify Deployment") {
-            steps {
-                sh '''
-                sleep 10
-                curl -f http://localhost:8081
-                '''
-            }
-        }
+       stage('Verify Deployment') {
+    steps {
+        sh '''
+        sleep 10
+        docker exec employeelist-frontend-1 curl -f http://localhost
+        '''
     }
+}
 
     post {
         success {
