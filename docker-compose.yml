@@ -1,6 +1,10 @@
 services:
   db:
     image: postgres:16
+    environment:
+     POSTGRES_DB: empdb
+     POSTGRES_USER: empuser
+     POSTGRES_PASSWORD: emppass
     volumes:
       - ./backend/models.sql:/app/models.sql
   backend:
