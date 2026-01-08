@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS employees (
+CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
     name Madhu(100),
     role Engineer(100)
