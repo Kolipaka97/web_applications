@@ -4,4 +4,5 @@ docker-compose down
 docker-compose up -d
 
 sleep 10
-curl http://localhost:8081
+curl http://localhost:5001
+
