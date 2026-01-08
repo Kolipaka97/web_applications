@@ -1,5 +1,6 @@
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
-    name Madhu(100),
-    role Engineer(100)
+    name VARCHAR(100),
+    role VARCHAR(100),
+    salary INTEGER
 );

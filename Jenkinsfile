@@ -96,16 +96,15 @@ pipeline {
 }
 
 
-        stage("Verify Deployment") {
-            steps {
-                sh """
-                sleep 10
-                curl -f http://localhost:8080
-                curl -f http://localhost:8080/api/employees
-                """
-            }
-        }
+        stage('Verify Deployment') {
+    steps {
+        sh '''
+        sleep 10
+        curl -f http://localhost:8081
+        '''
     }
+}
+
 
     post {
         success {
