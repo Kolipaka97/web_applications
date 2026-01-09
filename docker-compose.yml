@@ -1,12 +1,35 @@
-db:
-  image: postgres:16
-  container_name: web_applications-db
-  environment:
-    POSTGRES_USER: empuser
-    POSTGRES_PASSWORD: emppassword
-    POSTGRES_DB: empdb
-  volumes:
-    - pgdata:/var/lib/postgresql/data
-    - ./backend/models.sql:/docker-entrypoint-initdb.d/models.sql
-  networks:
-    - webnet
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: web_applications-db
+    environment:
+      POSTGRES_DB: employee_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    image: ${BACKEND_IMAGE}
+    container_name: web_applications-backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/employee_db
+    ports:
+      - "5001:5000"
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    container_name: web_applications-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:
