@@ -96,7 +96,7 @@ pipeline {
             }
         }
 
-    }
+    } 
 
     post {
         success {
@@ -109,4 +109,4 @@ pipeline {
             sh "docker system prune -f"
         }
     }
-}
+} 
