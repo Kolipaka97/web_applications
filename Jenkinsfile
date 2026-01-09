@@ -81,22 +81,20 @@ pipeline {
 stage('Run Database Migration') {
     steps {
         sh '''
-        echo "Waiting for DB..."
-        sleep 10
-        docker compose exec backend python app.py migrate || true
+        echo "Skipping migrate since backend already runs migrations"
         '''
     }
 }
 
-        stage("Verify Deployment") {
-            steps {
-                sh '''
-                sleep 10
-                curl -f http://localhost:8081
-                '''
-            }
-        }
+        stage('Verify Deployment') {
+    steps {
+        sh '''
+        sleep 10
+        curl -f http://localhost:3000
+        '''
     }
+}
+
 
     post {
         success {

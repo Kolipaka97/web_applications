@@ -82,5 +82,10 @@ def add_employee():
         return jsonify({"error": str(e)}), 500
 
 
+def migrate():
+    # create tables here
+    db.create_all()
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    migrate()
+    app.run(host="0.0.0.0", port=5000)
