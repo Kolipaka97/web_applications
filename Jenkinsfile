@@ -9,97 +9,109 @@ pipeline {
         FRONTEND_IMAGE = "${DOCKER_NAMESPACE}/frontend"
 
         IMAGE_TAG = "1"
+        COMPOSE_FILE = "docker-compose.yml"
     }
 
     stages {
 
-        stage('Checkout Source') {
+        stage("Checkout Source") {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Kolipaka97/web_applications.git'
+                git branch: 'main', url: 'https://github.com/Kolipaka97/web_applications.git'
             }
         }
 
-        stage('Build Docker Images') {
+        stage("Build Docker Images") {
             steps {
                 sh '''
-                docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} backend
-                docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} frontend
+                docker build -t $BACKEND_IMAGE:$IMAGE_TAG backend
+                docker build -t $FRONTEND_IMAGE:$IMAGE_TAG frontend
                 '''
             }
         }
 
-        stage('Run Unit Tests (Backend)') {
+        stage("Run Unit Tests (Backend)") {
             steps {
                 sh '''
-                docker run --rm ${BACKEND_IMAGE}:${IMAGE_TAG} pytest
+                docker run --rm $BACKEND_IMAGE:$IMAGE_TAG pytest
                 '''
             }
         }
 
-        stage('Security Scan (Trivy)') {
+        stage("Security Scan (Trivy)") {
             steps {
                 sh '''
-                trivy image --severity HIGH,CRITICAL ${BACKEND_IMAGE}:${IMAGE_TAG}
-                trivy image --severity HIGH,CRITICAL ${FRONTEND_IMAGE}:${IMAGE_TAG}
+                trivy image --severity HIGH,CRITICAL $BACKEND_IMAGE:$IMAGE_TAG
+                trivy image --severity HIGH,CRITICAL $FRONTEND_IMAGE:$IMAGE_TAG
                 '''
             }
         }
 
-        stage('Docker Login') {
+        stage("Docker Login") {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
+                withCredentials([
+                    string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')
+                ]) {
                     sh '''
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    echo "$DOCKER_PASS" | docker login -u madhudocker03 --password-stdin
                     '''
                 }
             }
         }
 
-        stage('Push Images to Registry') {
+        stage("Push Images to Registry") {
             steps {
                 sh '''
-                docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
-                docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+                docker push $BACKEND_IMAGE:$IMAGE_TAG
+                docker push $FRONTEND_IMAGE:$IMAGE_TAG
                 '''
             }
         }
 
-        stage('Deploy to Staging') {
+        stage("Deploy to Staging") {
             steps {
                 sh '''
-                export BACKEND_IMAGE=${BACKEND_IMAGE}:${IMAGE_TAG}
-                export FRONTEND_IMAGE=${FRONTEND_IMAGE}:${IMAGE_TAG}
-
+                export BACKEND_IMAGE=madhudocker03/backend:1
+                export FRONTEND_IMAGE=madhudocker03/frontend:1
                 docker compose down
                 docker compose up -d
                 '''
             }
         }
 
-        stage('Verify Deployment') {
+        stage("Run Database Migration") {
+    steps {
+        sh '''
+        DB_CONTAINER=$(docker compose ps -q db)
+
+        echo "Waiting for Postgres to be ready..."
+        until docker exec $DB_CONTAINER pg_isready -U empuser; do
+          sleep 2
+        done
+
+        docker exec $DB_CONTAINER psql -U empuser -d empdb -f /app/models.sql
+        '''
+    }
+}
+
+        stage("Verify Deployment") {
             steps {
                 sh '''
                 sleep 10
-                curl -f http://localhost || exit 1
+                curl -f http://localhost:8081
                 '''
             }
         }
     }
 
     post {
-        always {
-            sh 'docker system prune -f'
+        success {
+            echo " Deployment successful!"
         }
         failure {
-            echo 'Pipeline failed!'
+            echo " Pipeline failed!"
         }
-        success {
-            echo 'Pipeline completed successfully!'
+        cleanup {
+            sh "docker system prune -f"
         }
     }
 }
