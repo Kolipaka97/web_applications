@@ -68,16 +68,17 @@ pipeline {
         }
 
         stage("Deploy to Staging") {
-            steps {
-                sh '''
-                export BACKEND_IMAGE=${BACKEND_IMAGE}:${IMAGE_TAG}
-                export FRONTEND_IMAGE=${FRONTEND_IMAGE}:${IMAGE_TAG}
+    steps {
+        sh '''
+        export BACKEND_IMAGE=${BACKEND_IMAGE}:${IMAGE_TAG}
+        export FRONTEND_IMAGE=${FRONTEND_IMAGE}:${IMAGE_TAG}
 
-                docker-compose down -v
-                docker-compose up -d
-                '''
-            }
-        }
+        docker compose down -v
+        docker compose up -d
+        '''
+    }
+}
+
 
         stage('Run Database Migration') {
             steps {
