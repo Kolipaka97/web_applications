@@ -68,33 +68,35 @@ pipeline {
         }
 
         stage("Deploy to Staging") {
-    steps {
-        sh '''
-        export BACKEND_IMAGE=${BACKEND_IMAGE}
-        export FRONTEND_IMAGE=${FRONTEND_IMAGE}
+            steps {
+                sh '''
+                export BACKEND_IMAGE=${BACKEND_IMAGE}:${IMAGE_TAG}
+                export FRONTEND_IMAGE=${FRONTEND_IMAGE}:${IMAGE_TAG}
 
-        docker compose down -v
-        docker compose up -d
-        '''
-    }
-}
-stage('Run Database Migration') {
-    steps {
-        sh '''
-        echo "Skipping migrate since backend already runs migrations"
-        '''
-    }
-}
+                docker-compose down -v
+                docker-compose up -d
+                '''
+            }
+        }
+
+        stage('Run Database Migration') {
+            steps {
+                sh '''
+                echo "Skipping migrate since backend already runs migrations"
+                '''
+            }
+        }
 
         stage('Verify Deployment') {
-    steps {
-        sh '''
-        sleep 10
-        curl -f http://localhost:3000
-        '''
-    }
-}
+            steps {
+                sh '''
+                sleep 10
+                curl -f http://localhost:3000
+                '''
+            }
+        }
 
+    }
 
     post {
         success {
@@ -108,4 +110,3 @@ stage('Run Database Migration') {
         }
     }
 }
-} 
