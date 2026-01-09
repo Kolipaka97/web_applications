@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: postgres:16
@@ -27,10 +29,10 @@ services:
   frontend:
     image: ${FRONTEND_IMAGE}:${IMAGE_TAG}
     container_name: web_applications-frontend
-    ports:
-      - "3000:80"
     depends_on:
       - backend
+    ports:
+      - "3000:80"
 
 volumes:
   postgres_data:
