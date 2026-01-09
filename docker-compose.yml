@@ -5,31 +5,37 @@ services:
     image: postgres:16
     container_name: web_applications-db
     environment:
-      POSTGRES_USER: empuser
-      POSTGRES_PASSWORD: emppass
-      POSTGRES_DB: empdb
+      POSTGRES_DB: employee_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+    restart: always
 
   backend:
-    image: ${BACKEND_IMAGE}
+    image: ${BACKEND_IMAGE}:${IMAGE_TAG}
     container_name: web_applications-backend
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/employee_db
+      DB_HOST: db
+      DB_NAME: employee_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
     ports:
       - "5001:5000"
+    restart: always
 
   frontend:
-    image: ${FRONTEND_IMAGE}
+    image: ${FRONTEND_IMAGE}:${IMAGE_TAG}
     container_name: web_applications-frontend
     depends_on:
       - backend
     ports:
       - "3000:80"
+    restart: always
 
 volumes:
-  pgdata:
+  postgres_data:
