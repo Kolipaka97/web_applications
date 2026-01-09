@@ -78,7 +78,6 @@ pipeline {
         '''
     }
 }
-
 stage('Run Database Migration') {
     steps {
         sh '''
@@ -87,8 +86,6 @@ stage('Run Database Migration') {
         docker compose exec backend python app.py migrate || true
         '''
     }
-}
-
 }
 
         stage("Verify Deployment") {
