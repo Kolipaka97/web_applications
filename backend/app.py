@@ -1,91 +1,78 @@
 from flask import Flask, jsonify, request
-import psycopg2
-import psycopg2.extras
+from flask_sqlalchemy import SQLAlchemy
 import os
+import time
 
 app = Flask(__name__)
 
+# ------------------------
+# Database configuration
+# ------------------------
+DB_HOST = os.getenv("DB_HOST", "db")
+DB_NAME = os.getenv("POSTGRES_DB", "employee_db")
+DB_USER = os.getenv("POSTGRES_USER", "postgres")
+DB_PASS = os.getenv("POSTGRES_PASSWORD", "postgres")
 
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "dbname": os.getenv("DB_NAME", "employee_db"),
-    "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "postgres"),
-    "port": os.getenv("DB_PORT", "5432")
-}
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
+)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-def get_db():
-    try:
-        return psycopg2.connect(**DB_CONFIG)
-    except Exception as e:
-        print(" Database connection failed:", e)
-        raise
+db = SQLAlchemy(app)
 
+# ------------------------
+# Database model
+# ------------------------
+class Employee(db.Model):
+    __tablename__ = "employees"
 
-@app.route("/")
-def health():
-    return jsonify({"status": "Employee Backend Running"})
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(100), nullable=False)
 
-
-@app.route("/debug")
-def debug():
-    return jsonify({
-        "DB_HOST": DB_CONFIG["host"],
-        "DB_NAME": DB_CONFIG["dbname"],
-        "DB_USER": DB_CONFIG["user"],
-        "DB_PORT": DB_CONFIG["port"]
-    })
-
-
-@app.route("/api/employees", methods=["GET"])
-def get_employees():
-    try:
-        conn = get_db()
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cur.execute("SELECT id, name, role FROM employees;")
-        rows = cur.fetchall()
-
-        employees = [
-            {"id": row["id"], "name": row["name"], "role": row["role"]}
-            for row in rows
-        ]
-
-        cur.close()
-        conn.close()
-        return jsonify(employees)
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/api/employees", methods=["POST"])
-def add_employee():
-    try:
-        data = request.get_json()
-
-        if not data or "name" not in data or "role" not in data:
-            return jsonify({"error": "name and role are required"}), 400
-
-        conn = get_db()
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO employees (name, role) VALUES (%s, %s);",
-            (data["name"], data["role"])
-        )
-        conn.commit()
-
-        cur.close()
-        conn.close()
-        return jsonify({"message": "Employee added"}), 201
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
+# ------------------------
+# Auto-migration (FIXED)
+# ------------------------
 def migrate():
-    # create tables here
-    db.create_all()
+    with app.app_context():
+        retries = 5
+        while retries > 0:
+            try:
+                db.create_all()
+                print("Database migrated successfully")
+                return
+            except Exception as e:
+                print("Waiting for DB...", e)
+                retries -= 1
+                time.sleep(3)
+        raise Exception("Database not ready")
 
+# ------------------------
+# Routes
+# ------------------------
+@app.route("/health")
+def health():
+    return jsonify({"status": "UP"}), 200
+
+@app.route("/employees", methods=["GET"])
+def get_employees():
+    employees = Employee.query.all()
+    return jsonify([
+        {"id": e.id, "name": e.name, "role": e.role}
+        for e in employees
+    ])
+
+@app.route("/employees", methods=["POST"])
+def add_employee():
+    data = request.json
+    emp = Employee(name=data["name"], role=data["role"])
+    db.session.add(emp)
+    db.session.commit()
+    return jsonify({"message": "Employee added"}), 201
+
+# ------------------------
+# Entrypoint
+# ------------------------
 if __name__ == "__main__":
     migrate()
     app.run(host="0.0.0.0", port=5000)
