@@ -68,17 +68,16 @@ pipeline {
         }
 
         stage("Deploy to Staging") {
-    steps {
-        sh '''
-        export BACKEND_IMAGE=${BACKEND_IMAGE}:${IMAGE_TAG}
-        export FRONTEND_IMAGE=${FRONTEND_IMAGE}:${IMAGE_TAG}
+            steps {
+                sh '''
+                export BACKEND_IMAGE=${BACKEND_IMAGE}:${IMAGE_TAG}
+                export FRONTEND_IMAGE=${FRONTEND_IMAGE}:${IMAGE_TAG}
 
-        docker compose down -v
-        docker compose up -d
-        '''
-    }
-}
-
+                docker-compose down -v
+                docker-compose up -d
+                '''
+            }
+        }
 
         stage('Run Database Migration') {
             steps {
@@ -89,18 +88,13 @@ pipeline {
         }
 
         stage('Verify Deployment') {
-    steps {
-        sh '''
-          echo "Waiting for services..."
-          sleep 10
-
-          echo "Frontend check"
-          curl -f http://localhost:3000
-        '''
-    }
-}
-
-
+            steps {
+                sh '''
+                sleep 10
+                curl -f http://localhost:3000
+                '''
+            }
+        }
 
     } 
 
