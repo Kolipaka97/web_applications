@@ -1,35 +1,43 @@
-version: "3.9"  # you can omit version in V2
-services:
+version: "3.9"
 
+services:
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: web_applications-frontend
     ports:
-      - "8081:80"
+      - "3000:80"
     depends_on:
       - backend
-    volumes:
-      - nginx_cache:/var/cache/nginx
+    restart: unless-stopped
+    networks:
+      - webnet
 
   backend:
     image: madhudocker03/backend:1
     container_name: web_applications-backend
     ports:
       - "5001:5000"
-    depends_on:
-      - db
+    networks:
+      - webnet
 
   db:
     image: postgres:16
     container_name: web_applications-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: employee_db
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_DB: employee_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - webnet
+
+networks:
+  webnet:
 
 volumes:
-  nginx_cache:
+  pgdata:
