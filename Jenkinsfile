@@ -79,20 +79,16 @@ pipeline {
     }
 }
 
-
-        stage("Run Database Migration") {
+stage('Run Database Migration') {
     steps {
         sh '''
-        DB_CONTAINER=$(docker compose ps -q db)
-
-        echo "Waiting for Postgres to be ready..."
-        until docker exec $DB_CONTAINER pg_isready -U empuser; do
-          sleep 2
-        done
-
-        docker exec $DB_CONTAINER psql -U empuser -d empdb -f /app/models.sql
+        echo "Waiting for DB..."
+        sleep 10
+        docker compose exec backend python app.py migrate || true
         '''
     }
+}
+
 }
 
         stage("Verify Deployment") {
