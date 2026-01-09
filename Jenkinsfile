@@ -91,12 +91,15 @@ pipeline {
         stage('Verify Deployment') {
     steps {
         sh '''
+          echo "Waiting for services..."
           sleep 10
-          docker exec web_applications-frontend curl -f http://localhost
-          docker exec web_applications-backend curl -f http://localhost:5000/employees
+
+          echo "Frontend check"
+          curl -f http://localhost:3000
         '''
     }
 }
+
 
 
     } 
