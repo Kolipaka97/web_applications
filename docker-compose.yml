@@ -1,43 +1,12 @@
-version: "3.9"
-
-services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: web_applications-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    restart: unless-stopped
-    networks:
-      - webnet
-
-  backend:
-    image: madhudocker03/backend:1
-    container_name: web_applications-backend
-    ports:
-      - "5001:5000"
-    networks:
-      - webnet
-
-  db:
-    image: postgres:16
-    container_name: web_applications-db
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: employee_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - webnet
-
-networks:
-  webnet:
-
-volumes:
-  pgdata:
+db:
+  image: postgres:16
+  container_name: web_applications-db
+  environment:
+    POSTGRES_USER: empuser
+    POSTGRES_PASSWORD: emppassword
+    POSTGRES_DB: empdb
+  volumes:
+    - pgdata:/var/lib/postgresql/data
+    - ./backend/models.sql:/docker-entrypoint-initdb.d/models.sql
+  networks:
+    - webnet
