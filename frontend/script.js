@@ -1,23 +1,11 @@
 function loadEmployees() {
-  fetch("http://backend:5000/employees")
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Failed to fetch employees");
-      }
-      return response.json();
-    })
+  fetch("/api/employees")
+    .then(res => res.json())
     .then(data => {
       const list = document.getElementById("list");
       list.innerHTML = "";
-
-      data.forEach(emp => {
-        const li = document.createElement("li");
-        li.textContent = `${emp.id} - ${emp.name} (${emp.role})`;
-        list.appendChild(li);
+      data.forEach(e => {
+        list.innerHTML += `<li>${e.name} - ${e.role}</li>`;
       });
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("Could not load employees");
     });
 }

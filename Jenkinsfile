@@ -89,13 +89,15 @@ pipeline {
         }
 
         stage('Verify Deployment') {
-            steps {
-                sh '''
-                sleep 10
-                curl -f http://localhost:3000
-                '''
-            }
-        }
+    steps {
+        sh '''
+          sleep 10
+          docker exec web_applications-frontend curl -f http://localhost
+          docker exec web_applications-backend curl -f http://localhost:5000/employees
+        '''
+    }
+}
+
 
     } 
 
