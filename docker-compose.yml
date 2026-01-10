@@ -1,36 +1,35 @@
+version: "3.9"
+
 services:
   db:
-    image: postgres:16
+    image: postgres:15
     container_name: web_applications-db
     environment:
-      POSTGRES_USER: empuser
-      POSTGRES_PASSWORD: emppassword
-      POSTGRES_DB: empdb
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   backend:
-    image: madhudocker03/backend:1
+    build: ./backend
     container_name: web_applications-backend
     depends_on:
       - db
     environment:
-      DB_HOST: db
-      DB_USER: empuser
-      DB_PASSWORD: emppassword
-      DB_NAME: empdb
+      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
     ports:
-      - "5001:5001"
+      - "5000:5000"
 
   frontend:
-    image: madhudocker03/frontend:1
+    build: ./frontend
     container_name: web_applications-frontend
-    depends_on:
-      - backend
     ports:
       - "3000:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

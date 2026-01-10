@@ -1,84 +1,82 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_cors import CORS
 import os
-import time
 
 app = Flask(__name__)
+CORS(app)
 
-# ------------------------
-# Database configuration
-# ------------------------
-DB_HOST = os.getenv("DB_HOST", "db")
-DB_NAME = os.getenv("POSTGRES_DB", "employee_db")
-DB_USER = os.getenv("POSTGRES_USER", "postgres")
-DB_PASS = os.getenv("POSTGRES_PASSWORD", "postgres")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
-)
+if not DATABASE_URL:
+    DATABASE_URL = (
+        f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:"
+        f"{os.getenv('POSTGRES_PASSWORD', 'password')}@"
+        f"{os.getenv('POSTGRES_HOST', 'db')}:"
+        f"{os.getenv('POSTGRES_PORT', '5432')}/"
+        f"{os.getenv('POSTGRES_DB', 'postgres')}"
+    )
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-# ------------------------
-# Database model
-# ------------------------
+
 class Employee(db.Model):
     __tablename__ = "employees"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    department = db.Column(db.String(50))
 
-# ------------------------
-# Auto-migration (FIXED)
-# ------------------------
-def migrate():
-    with app.app_context():
-        retries = 5
-        while retries > 0:
-            try:
-                db.create_all()
-                print("Database migrated successfully")
-                return
-            except Exception as e:
-                print("Waiting for DB...", e)
-                retries -= 1
-                time.sleep(3)
-        raise Exception("Database not ready")
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "department": self.department
+        }
 
-# ------------------------
-# Routes
-# ------------------------
-@app.route("/health")
+
+
+@app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "UP"}), 200
+    return {"status": "ok"}
+
 
 @app.route("/employees", methods=["GET"])
 def get_employees():
     employees = Employee.query.all()
-    return jsonify([
-        {"id": e.id, "name": e.name, "role": e.role}
-        for e in employees
-    ])
+    return jsonify([e.to_dict() for e in employees])
+
 
 @app.route("/employees", methods=["POST"])
-def add_employee():
-    data = request.json
-    emp = Employee(name=data["name"], role=data["role"])
-    db.session.add(emp)
+def create_employee():
+    data = request.get_json(silent=True)
+
+    if not data or "name" not in data or "email" not in data:
+        return {"error": "name and email required"}, 400
+
+    employee = Employee(
+        name=data["name"],
+        email=data["email"],
+        department=data.get("department")
+    )
+
+    db.session.add(employee)
     db.session.commit()
-    return jsonify({"message": "Employee added"}), 201
 
-# ------------------------
-# Entrypoint
-# ------------------------
+    return jsonify(employee.to_dict()), 201
+
+
+
+with app.app_context():
+    db.create_all()
+
+
 if __name__ == "__main__":
-    migrate()
     app.run(host="0.0.0.0", port=5000)
-    
-@app.route("/health")
-def health():
-    return {"status": "ok"}
-
-    

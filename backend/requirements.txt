@@ -1,4 +1,6 @@
-flask
-sqlalchemy
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+flask-cors
 psycopg2-binary
-pytest
+gunicorn
