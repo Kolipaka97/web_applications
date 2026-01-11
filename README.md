@@ -1,4 +1,4 @@
-Employee Management Web Application
+**Employee Management Web Application**
 
 A full-stack Employee Management Web Application built using:
 Backend: Flask, SQLAlchemy, PostgreSQL
