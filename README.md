@@ -57,12 +57,12 @@ Docker
 Docker Compose
 Git
 
-Access the Application
-Service	URL
-Frontend	http://localhost:3000
-Backend API	http://localhost:5000
-Health Check	http://localhost:5000/health
-Employees API	http://localhost:5000/employees
+| Service        | URL                                                                |
+| -------------- | ------------------------------------------------------------------ |
+| Frontend       | [http://localhost:3000](http://localhost:3000)                     |
+| Backend Health | [http://localhost:5000/health](http://localhost:5000/health)       |
+| Employees API  | [http://localhost:5000/employees](http://localhost:5000/employees) |
+
 
 
 
