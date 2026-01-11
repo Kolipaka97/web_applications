@@ -170,7 +170,7 @@ http://<jenkins-server-ip>:3000
 
 Docker Services
 
-Backend
+#Backend
 
 Python 3.11
 Gunicorn server
