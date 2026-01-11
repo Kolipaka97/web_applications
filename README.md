@@ -87,17 +87,38 @@ Deployment Complete
 Jenkins Architecture
 
 Jenkins Server: Installed on EC2 / VM
+
+
 Docker: Installed on Jenkins server
+
+
 Docker Compose: Used for multi-container deployment
+
+
 GitHub Repo: Source code repository
 
 
+
+
+
 Pipeline Stages Explained
+
+
 Stage	Description
+
+
 Checkout Code	Pulls latest code from GitHub
+
+
 Stop Containers	Stops old containers safely
+
+
 Build Images	Builds backend & frontend images
+
+
 Start Application	Starts services via Docker Compose
+
+
 Health Check	Verifies backend availability
 
 
@@ -115,12 +136,23 @@ Health Check	Verifies backend availability
 
 Docker Compose Used in Pipeline
 
+
+
 Jenkins uses your existing:
+
+
 docker-compose.yml
+
+
 Services deployed:
 
+
 PostgreSQL
+
+
 Flask Backend
+
+
 Frontend (Nginx)
 
 
