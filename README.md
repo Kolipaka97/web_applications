@@ -101,6 +101,15 @@ Start Application	Starts services via Docker Compose
 Health Check	Verifies backend availability
 
 
+| Stage             | Description                          |
+| ----------------- | ------------------------------------ |
+| Checkout Code     | Pulls latest code from GitHub        |
+| Stop Containers   | Stops existing containers safely     |
+| Build Images      | Builds backend and frontend images   |
+| Start Application | Starts services using Docker Compose |
+| Health Check      | Verifies backend availability        |
+
+
 
 
 
@@ -167,7 +176,15 @@ docker compose up --build
 
 //Future Improvements\\
  Add frontend form for employee creation
+
+ 
  Add authentication
+
+ 
  Add pagination & search
+
+ 
  Add CI/CD with Jenkins
+
+ 
  Add Kubernetes deployment
