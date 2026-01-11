@@ -173,17 +173,34 @@ http://<jenkins-server-ip>:3000
 **Backend**
 
 Python 3.11
+
+
 Gunicorn server
+
+
 Flask + SQLAlchemy
+
+
 Runs on port 5000
+
 
 **Frontend**
 
 Node 20 build stage
+
+
 Served via Nginx
+
+
 Runs on port 3000
+
+
 Database
+
+
 PostgreSQL 15
+
+
 Persistent volume enabled
 
 
