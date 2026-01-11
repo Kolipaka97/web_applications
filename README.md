@@ -41,7 +41,6 @@ One-command deployment using Docker Compose
 ├── deploy.sh
 └── README.md
 
-
 Requirements 
 Docker
 Docker Compose
