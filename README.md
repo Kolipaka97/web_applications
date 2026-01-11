@@ -8,7 +8,7 @@ Containerization: Docker & Docker Compose
 Deployment: Shell script (deploy.sh)
 
 
-Features
+**Features**
 
 Add employee details (name, email, department)
 View employee list from database
@@ -57,7 +57,7 @@ Git
 
 
 
-CI/CD Workflow Overview
+**CI/CD Workflow Overview**
 
 GitHub Commit / Push
         |
@@ -84,7 +84,7 @@ Deployment Complete
 
 
 
-Jenkins Architecture
+**Jenkins Architecture**
 
 Jenkins Server: Installed on EC2 / VM
 
@@ -101,7 +101,7 @@ GitHub Repo: Source code repository
 
 
 
-Pipeline Stages Explained
+**Pipeline Stages Explained**
 
 
 Stage	Description
@@ -168,16 +168,16 @@ http://<jenkins-server-ip>:3000
 
 
 
-Docker Services
+**Docker Services**
 
-#Backend
+**Backend**
 
 Python 3.11
 Gunicorn server
 Flask + SQLAlchemy
 Runs on port 5000
 
-Frontend
+**Frontend**
 
 Node 20 build stage
 Served via Nginx
@@ -187,12 +187,12 @@ PostgreSQL 15
 Persistent volume enabled
 
 
-Environment Variables
+**Environment Variables**
 Backend uses the following environment variables (set via Docker Compose):
 DATABASE_URL=postgresql://postgres:password@db:5432/postgres
 
 
-Troubleshooting
+**Troubleshooting**
 Backend not responding?
 docker compose logs backend
 
@@ -206,7 +206,7 @@ docker compose down -v
 docker compose up --build
 
 
-//Future Improvements\\
+**Future Improvements**
 
 
  Add frontend form for employee creation
