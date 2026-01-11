@@ -134,7 +134,7 @@ Health Check	Verifies backend availability
 
 
 
-Docker Compose Used in Pipeline
+**Docker Compose Used in Pipeline**
 
 
 
