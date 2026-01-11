@@ -66,6 +66,8 @@ Employees API	http://localhost:5000/employees
 
 
 
+
+
 CI/CD Workflow Overview
 
 GitHub Commit / Push
@@ -90,6 +92,9 @@ Deployment Complete
 
 
 
+
+
+
 Jenkins Architecture
 
 Jenkins Server: Installed on EC2 / VM
@@ -105,6 +110,10 @@ Stop Containers	Stops old containers safely
 Build Images	Builds backend & frontend images
 Start Application	Starts services via Docker Compose
 Health Check	Verifies backend availability
+
+
+
+
 
 Docker Compose Used in Pipeline
 
@@ -123,6 +132,9 @@ curl http://<jenkins-server-ip>:5000/health
 
 Frontend
 http://<jenkins-server-ip>:3000
+
+
+
 
 
 
@@ -157,14 +169,16 @@ docker compose logs backend
 Database issues?
 docker compose logs db
 
+
+
 Rebuild everything cleanly
 docker compose down -v
 docker compose up --build
 
 
-Future Improvements
-Add frontend form for employee creation
-Add authentication
-Add pagination & search
-Add CI/CD with Jenkins
-Add Kubernetes deployment
+//Future Improvements\\
+ Add frontend form for employee creation
+ Add authentication
+ Add pagination & search
+ Add CI/CD with Jenkins
+ Add Kubernetes deployment
