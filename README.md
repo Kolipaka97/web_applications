@@ -17,22 +17,12 @@ PostgreSQL database integration
 Dockerized backend & frontend
 One-command deployment using Docker Compose
 
-Architecture Overview
-Browser
-   |
-   |  http://localhost:3000
-   ▼
-Frontend (Nginx + JS)
-   |
-   |  http://backend:5000/employees
-   ▼
-Backend (Flask + Gunicorn)
-   |
-   ▼
-PostgreSQL Database
-
-
-Project Structure
+| Container | Technology                | Port |
+| --------- | ------------------------- | ---- |
+| frontend  | Nginx (Node build output) | 3000 |
+| backend   | Flask + Gunicorn          | 5000 |
+| db        | PostgreSQL 15             | 5432 |
+| jenkins   | Jenkins CI/CD             | 8080 |
 
 .
 ├── backend
